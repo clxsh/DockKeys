@@ -7,9 +7,9 @@ enum DockIcon {
         let image = NSImage(size: NSSize(width: 18, height: 18), flipped: false) { _ in
             NSColor.black.setFill()
             for rect in [
-                NSRect(x: 1, y: 6, width: 4, height: 6),
-                NSRect(x: 7, y: 6, width: 4, height: 9),
-                NSRect(x: 13, y: 6, width: 4, height: 6)
+                NSRect(x: 1, y: 6, width: 4, height: 4),
+                NSRect(x: 7, y: 9, width: 4, height: 4),
+                NSRect(x: 13, y: 6, width: 4, height: 4)
             ] {
                 NSBezierPath(roundedRect: rect, xRadius: 1, yRadius: 1).fill()
             }
