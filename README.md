@@ -1,12 +1,14 @@
-<p align="center"><img src="docs/assets/dockkeys.svg" width="88" height="88" alt="DockKeys" /></p>
+<p align="center"><img src="docs/assets/dockkeys.png" width="88" height="88" alt="DockKeys" /></p>
 
 # DockKeys
+
+**简体中文** · [English](README.en.md)
 
 **用数字快捷键，直达 Dock 中的应用。**
 
 DockKeys 是一个轻量的 macOS 菜单栏工具。按下 `⌥ + 1` 打开或切换到 Dock 中的第一个固定应用，`⌥ + 2` 对应第二个，以此类推。移动 Dock 图标后，快捷键会自动跟随新顺序。
 
-Swift / AppKit / SwiftUI · Apple Silicon 原生 · macOS 13+ · 无第三方依赖 · [MIT 许可](LICENSE)
+Swift / AppKit / SwiftUI · Apple Silicon / Intel · macOS 13+ · 无第三方依赖 · [MIT 许可](LICENSE)
 
 ## 开发背景
 
@@ -33,12 +35,23 @@ DockKeys 因此围绕三个目标设计：**按 Dock 顺序直达应用、配置
 
 ## 快速开始
 
-已构建的应用位于 `dist/DockKeys.app`。如果从源码开始，请先阅读下面的构建说明。
+从 [GitHub Releases](https://github.com/clxsh/DockKeys/releases/latest) 下载对应的 DMG：
 
-1. 将 `DockKeys.app` 放到“应用程序”文件夹后打开。
-2. 首次启动会显示设置窗口，确认右侧应用顺序。
-3. 按 `Option + 数字` 启动或切换应用。
-4. 关闭设置窗口后，程序继续在菜单栏运行。点击“三个应用方块＋底座”图标可返回设置、暂停快捷键或退出。
+| 你的 Mac | 下载文件 |
+|---|---|
+| Apple Silicon（M 系列芯片） | `DockKeys-<版本号>-arm64.dmg` |
+| Intel 处理器 | `DockKeys-<版本号>-x86_64.dmg` |
+
+1. 退出正在运行的旧版 DockKeys。
+2. 双击 DMG，将 `DockKeys.app` 拖到其中的 `Applications` 文件夹快捷方式。
+3. 从“应用程序”打开 DockKeys，然后推出磁盘映像。
+4. 首次启动会显示设置窗口。确认映射后，按 `Option + 数字` 启动或切换应用。
+
+ZIP 包含相同的应用，可解压后手动放入“应用程序”。将下载的文件和 `SHA256SUMS.txt` 放在同一目录，运行 `shasum -a 256 -c SHA256SUMS.txt --ignore-missing` 可核对文件完整性。
+
+**当前产物使用临时签名，尚未经过 Apple 公证。** 如系统阻止打开，请先确认下载来源和校验值，再参考 [Apple 的逐应用允许打开说明](https://support.apple.com/en-sg/guide/mac-help/mh40616/mac)。DMG 只负责打包，不会替代签名和公证。
+
+关闭设置窗口后，程序继续在菜单栏运行。点击“三个应用方块＋底座”图标可返回设置、暂停快捷键或退出。
 
 例如，Dock 中固定的是 `浏览器 → 终端 → 编辑器`，默认就对应 `⌥1 → ⌥2 → ⌥3`。开启“Finder 参与编号”后，Finder 使用 `⌥1`，其余应用顺延。
 
@@ -46,11 +59,11 @@ DockKeys 因此围绕三个目标设计：**按 Dock 顺序直达应用、配置
 
 ## 系统要求与权限
 
-- 最低 macOS 13。默认构建目标是 Apple Silicon / ARM64。
+- 最低 macOS 13。分别提供 Apple Silicon / ARM64 和 Intel / x86_64 产物。
 - 核心功能使用系统热键注册和应用打开接口，不需要辅助功能或屏幕录制权限。
 - 登录启动使用系统登录项服务；macOS 要求确认时，设置页会提供入口。
 - 应用运行不需要联网，没有账号、遥测或自动更新服务。
-- 默认构建采用本地临时签名，尚未经过 Apple 公证。用于本地构建试用；正式分发可以指定 Developer ID 签名身份并另行公证。
+- ARM64 已在本机构建和测试。Intel 版通过交叉编译、架构、签名及安装包内容检查，尚未在 Intel Mac 上运行验证。
 
 ## 构建与测试
 
@@ -61,25 +74,37 @@ git clone https://github.com/clxsh/DockKeys.git
 cd DockKeys
 ./scripts/test.sh
 ./scripts/build.sh
-open dist/DockKeys.app
+open dist/arm64/DockKeys.app
 ```
 
-构建产物：
+默认构建 ARM64；使用 `ARCH=x86_64 ./scripts/build.sh` 构建 Intel 版。两种架构存放在独立目录，不会相互覆盖。
+
+生成两套 DMG、ZIP 及校验文件：
+
+```sh
+./scripts/release.sh
+./scripts/verify-release.sh
+```
 
 ```text
 dist/
-├── DockKeys.app
-└── DockKeys-arm64.zip
+├── arm64/DockKeys.app
+├── x86_64/DockKeys.app
+├── DockKeys-<版本号>-arm64.dmg
+├── DockKeys-<版本号>-arm64.zip
+├── DockKeys-<版本号>-x86_64.dmg
+├── DockKeys-<版本号>-x86_64.zip
+└── SHA256SUMS.txt
 ```
 
-构建脚本优先使用独立 Command Line Tools，也支持已有的 `DEVELOPER_DIR`。通过 `CODE_SIGN_IDENTITY` 可指定签名身份；`ARCH=x86_64 ./scripts/build.sh` 可生成 Intel 版本，但该平台需要独立验证。
+构建脚本优先使用独立 Command Line Tools，也支持已有的 `DEVELOPER_DIR`。通过 `CODE_SIGN_IDENTITY` 可指定 Developer ID 签名身份，启用 hardened runtime 和时间戳；公证及 stapling 需要在签名后另行完成。
 
-自动测试覆盖 Dock 顺序、Finder 编号、空编号、无效条目、路径编码、十项上限、隐藏开关，以及真实系统热键的占用和释放。热键集成测试需要在已登录的 macOS 图形会话中执行；受限执行沙箱或无图形会话的环境可能无法完成注册。
+自动测试覆盖 Dock 顺序、Finder 编号、空编号、无效条目、路径编码、十项上限、隐藏开关，以及真实系统热键的占用和释放。热键集成测试需要在已登录的 macOS 图形会话中执行；受限执行沙箱或无图形会话的环境可能无法完成注册。安装包检查覆盖两套 DMG 和解压后的 ZIP 应用，核对架构、版本、签名、统一图标、Applications 快捷方式及校验值。
 
 查看当前 Dock 映射而不启动界面：
 
 ```sh
-dist/DockKeys.app/Contents/MacOS/DockKeys --diagnose
+dist/arm64/DockKeys.app/Contents/MacOS/DockKeys --diagnose
 ```
 
 ## 功能边界
@@ -90,7 +115,7 @@ dist/DockKeys.app/Contents/MacOS/DockKeys --diagnose
 - 最小化窗口恢复、全屏和跨桌面切换由目标应用及 macOS 设置决定，不强行移动窗口。
 - 全局热键注册能检测其他全局热键的占用，无法预知每个应用自己的菜单快捷键。`Command + 数字` 等组合可能覆盖浏览器切换标签等操作。
 - Dock 固定应用列表读取自系统偏好设置，未来 macOS 调整存储格式时可能需要适配。
-- 设置界面目前为简体中文。自动更新、按应用单独录制快捷键不在当前版本范围内。
+- 设置界面目前为简体中文；英文 README 不改变界面语言。自动更新、按应用单独录制快捷键不在当前版本范围内。
 
 ## 代码结构
 
@@ -100,17 +125,17 @@ dist/DockKeys.app/Contents/MacOS/DockKeys --diagnose
 | `Sources/DockReader.swift` | 刷新并读取 Dock 偏好设置 |
 | `Sources/HotKeyManager.swift` | 注册、释放全局热键和报告冲突 |
 | `Sources/AppState.swift` | 设置、顺序同步、启动／隐藏、登录启动 |
-| `Sources/DockIcon.swift` | 菜单栏与设置窗口共享的 Dock 图标 |
+| `Sources/DockIcon.swift` | 应用图标与菜单栏符号的共享绘制实现 |
 | `Sources/SettingsView.swift` | 设置及实时映射界面 |
 | `Sources/Main.swift` | 应用生命周期和菜单栏 |
 | `Tests/` | 核心逻辑与系统热键集成测试 |
-| `scripts/` | 本地构建、测试和应用图标生成 |
+| `scripts/` | 构建、测试、图标生成、DMG 打包及安装包验证 |
 
 ## 反馈与贡献
 
 欢迎通过 [Issues](https://github.com/clxsh/DockKeys/issues) 反馈问题。请尽量提供 macOS 版本、处理器架构、快捷键组合、Finder 编号设置，以及复现步骤。涉及应用切换时，请说明目标应用是否处于最小化、全屏或其他桌面。
 
-提交代码前运行 `./scripts/test.sh` 和 `./scripts/build.sh`，并验证受影响的界面或系统行为。
+提交代码前运行 `./scripts/test.sh` 和 `./scripts/build.sh`，并验证受影响的界面或系统行为。打包相关修改还需运行 `./scripts/release.sh` 和 `./scripts/verify-release.sh`。
 
 ## 许可证
 

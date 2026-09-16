@@ -8,7 +8,9 @@ if [ -z "${DEVELOPER_DIR:-}" ] && [ -d /Library/Developer/CommandLineTools ]; th
 fi
 SDK_PATH="$(xcrun --sdk macosx --show-sdk-path)"
 BUILD_ARCH="${ARCH:-arm64}"
-APP_PATH="$PWD/dist/DockKeys.app"
+case "$BUILD_ARCH" in arm64|x86_64) ;; *) printf 'Unsupported architecture: %s\n' "$BUILD_ARCH" >&2; exit 1 ;; esac
+VERSION=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Resources/Info.plist)
+APP_PATH="$PWD/dist/$BUILD_ARCH/DockKeys.app"
 mkdir -p build/module-cache "$APP_PATH/Contents/MacOS" "$APP_PATH/Contents/Resources"
 
 xcrun swiftc -swift-version 5 -O -sdk "$SDK_PATH" \
@@ -18,11 +20,16 @@ xcrun swiftc -swift-version 5 -O -sdk "$SDK_PATH" \
 cp Resources/Info.plist "$APP_PATH/Contents/Info.plist"
 
 xcrun swiftc -sdk "$SDK_PATH" -module-cache-path "$PWD/build/module-cache" \
-    scripts/make-icon.swift -o build/make-icon
+    Sources/DockIcon.swift scripts/make-icon.swift -o build/make-icon
 build/make-icon "$PWD/build/AppIcon.iconset"
+cp build/AppIcon.iconset/icon_256x256.png docs/assets/dockkeys.png
 iconutil -c icns build/AppIcon.iconset -o "$APP_PATH/Contents/Resources/AppIcon.icns"
 cp LICENSE "$APP_PATH/Contents/Resources/LICENSE"
-codesign --force --sign "${CODE_SIGN_IDENTITY:--}" --timestamp=none "$APP_PATH"
+if [ "${CODE_SIGN_IDENTITY:--}" = '-' ]; then
+    codesign --force --sign - --timestamp=none "$APP_PATH"
+else
+    codesign --force --sign "$CODE_SIGN_IDENTITY" --options runtime --timestamp "$APP_PATH"
+fi
 codesign --verify --strict "$APP_PATH"
-ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "dist/DockKeys-$BUILD_ARCH.zip"
+ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "dist/DockKeys-$VERSION-$BUILD_ARCH.zip"
 printf 'Built: %s\n' "$APP_PATH"

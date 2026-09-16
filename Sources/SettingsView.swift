@@ -8,13 +8,9 @@ struct SettingsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             HStack(spacing: 14) {
-                Image(nsImage: DockIcon.image())
-                    .renderingMode(.template)
+                Image(nsImage: DockIcon.appImage())
                     .resizable()
-                    .frame(width: 32, height: 32)
-                    .foregroundStyle(.white)
-                    .frame(width: 58, height: 58)
-                    .background(accent.gradient, in: RoundedRectangle(cornerRadius: 16))
+                    .frame(width: 68, height: 68)
                 VStack(alignment: .leading, spacing: 5) {
                     Text("DockKeys").font(.system(size: 27, weight: .bold, design: .rounded))
                     Text("按 Dock 顺序，快速打开或切换应用").foregroundStyle(.secondary)

@@ -1,0 +1,23 @@
+DockKeys — 安装 / Installation
+
+简体中文
+1. 退出正在运行的旧版 DockKeys。
+2. 将 DockKeys.app 拖到本窗口的 Applications 文件夹。
+3. 从“应用程序”打开 DockKeys，然后推出磁盘映像。
+4. 首次启动查看快捷键映射。默认 Option + 1…9、0 对应固定在 Dock 的应用。
+
+系统要求：macOS 13 或更新版本。arm64 用于 Apple Silicon，x86_64 用于 Intel。
+此版本使用临时签名，尚未经过 Apple 公证。
+如系统阻止启动，在确认下载来源和 SHA-256 校验值后，参考 Apple 的逐应用允许打开说明：
+https://support.apple.com/en-sg/guide/mac-help/mh40616/mac
+
+English
+1. Quit any older running copy of DockKeys.
+2. Drag DockKeys.app into the Applications folder in this window.
+3. Open DockKeys from Applications, then eject the disk image.
+4. Review the shortcut mapping. By default, Option + 1…9 and 0 target pinned Dock apps.
+
+Requires macOS 13 or later. Choose arm64 for Apple Silicon or x86_64 for Intel.
+This release is ad-hoc signed and is not notarized by Apple.
+If macOS blocks opening, verify the download source and SHA-256 checksum, then follow Apple's per-app instructions:
+https://support.apple.com/en-sg/guide/mac-help/mh40616/mac
